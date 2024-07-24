@@ -2,6 +2,21 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+void processInput(GLFWwindow* window) {
+	// Here, we have a void function that takes in a pointer to our window.
+
+	// This if statement checks if the escape key is pressed, and when it is the window is closed.
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+		glfwSetWindowShouldClose(window, true);
+	}
+
+	// This if statement checks if the r key is pressed, and when it is the window is renamed.
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
+		glfwSetWindowTitle(window, "I HAVE NO IDEA WHAT I'M DOING!!!!!!\n");
+	}
+}
+
+
 
 int main() {
 	// Initialize GLFW
@@ -33,17 +48,28 @@ int main() {
 	// In this case the viewpoint goes from x = 0, y = 0, to x = 600, y = 600
 	glViewport(0, 0, 600, 600);
 
-	// Specify the color of the background
-	glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
-	// Clean the back buffer and assign the new color to it
-	glClear(GL_COLOR_BUFFER_BIT);
-	// Swap the back buffer with the front buffer
-	glfwSwapBuffers(window);
+
+	// Get some input control in GLFW. This function returns which key is being pressed.
+
 
 	// Main while loop
 	while (!glfwWindowShouldClose(window)) {
+		// user input
+		processInput(window);
+
+		// render commands go here:
+		// Specify the color of the background
+		glClearColor(0.2f, 0.3f, 0.8f, 1.0f); //state-setting function
+		// Clean the back buffer and assign the new color to it
+		glClear(GL_COLOR_BUFFER_BIT); //state-using function
+
+
+
+
 		// Take care of all GLFW events
 		glfwPollEvents();
+		// Swap the back buffer with the front buffer
+		glfwSwapBuffers(window);
 	}
 
 	// Delete window before ending the program
