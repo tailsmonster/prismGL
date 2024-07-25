@@ -1,8 +1,10 @@
 .vs
 .git 
 
+
 x64
 First-Op.72facfa0
 
 First-OpenGL-Project.vcxproj.user
-
+First-OpenGL-Project.vcxproj.filters
+First-OpenGL-Project.vcxproj
