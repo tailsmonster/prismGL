@@ -43,15 +43,15 @@ GLuint triIndices[] = {
 
 //SQUARE :D
 GLfloat vertices[] = {
-	//    COORDS          /      COLORS            //
-	-0.5f, -0.5f,  0.0f,   1.0f,  0.0f, 0.0f,  // Lower Left Corner
-	-0.5f,  0.5f,  0.0f,   0.0f,  1.0f, 0.0f,  // Upper Left Corner
-	 0.5f,  0.5f,  0.0f,   0.0f,  0.0f, 1.0f,  // Upper Right Corner
-	 0.5f, -0.5f,  0.0f,   1.0f,  1.0f, 1.0f,  // Lower Left Corner
+	//    COORDS              /      COLORS    /              MAPPING   //
+	-0.5f, -0.5f,  0.0f,       1.0f,  0.0f, 0.0f,       0.0f, 0.0f, // Lower Left Corner
+	-0.5f,  0.5f,  0.0f,       0.0f,  1.0f, 0.0f,       0.0f, 1.0f, // Upper Left Corner
+	 0.5f,  0.5f,  0.0f,       0.0f,  0.0f, 1.0f,       1.0f, 1.0f, // Upper Right Corner
+	 0.5f, -0.5f,  0.0f,       1.0f,  1.0f, 1.0f,       1.0f, 0.0f, // Lower Left Corner
 };
 GLuint indices[] = {
-	0, 2, 1,
-	0, 3, 2
+	0, 2, 1, // Upper Tri
+	0, 3, 2  // Lower Triangle
 };
 
 
@@ -102,17 +102,59 @@ int main() {
 	EBO EBO1(indices, sizeof(indices));
 
 	// Links our VBO to our VAO. Then unbind VAO, VBO, and EBO to prevent overwriting
-	VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 6 * sizeof(float), (void*)0);
-	VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
+	VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	VAO1.LinkAttrib(VBO1, 2, 2, GL_FLOAT, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	// Unbind to prevent accidentally overwriting!
 	VAO1.Unbind();
 	VBO1.Unbind();
 	EBO1.Unbind();
 
+
+	// Getes ID of uniform called "scale"
 	GLuint uniformID = glGetUniformLocation(shaderProgram.ID, "scale");
 
 
+	// Texture!
+	int widthImg, heightImg, numColCh;
+	unsigned char* bytes = stbi_load("aigis.png", &widthImg, &heightImg, &numColCh, 0);
+
+	//the texture object itself
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	// here we choose nearest neighbor or linear.
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+
+	// repeating wahooie
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	
+	//gl plan to order
+	// float flatColor[] = {1.0f, 1.0f, 1.0f, 1.0f};
+	// glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, flatColor};
+
+	// gen texture
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, widthImg, heightImg, 0, GL_RGB, GL_UNSIGNED_BYTE, bytes);
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	/*
+	The most common color channels are 
+	GL_RGBA -> JPEG files
+	GL_RGB -> PNG files
+	*/
+
+	// texture uniform
+	GLuint tex0Uniform = glGetUniformLocation(shaderProgram.ID, "tex0");
+	shaderProgram.Activate();
+
+
 	// Specify the color of the background
-	glClearColor(0.2f, 0.3f, 0.8f, 1.0f); //state-setting function
+	glClearColor(0.2f, 0.3f, 0.3f, 1.0f); //state-setting function
 	// Clean the back buffer and assign the new color to it
 	glClear(GL_COLOR_BUFFER_BIT); //state-using function
 	// Swap the back buffer with the front buffer
@@ -127,16 +169,18 @@ int main() {
 
 		// render commands go here:
 		// Specify the color of the background
-		glClearColor(0.2f, 0.3f, 0.8f, 1.0f); //state-setting function
+		glClearColor(0.2f, 0.1f, 0.3f, 1.0f); //state-setting function
 		// Clean the back buffer and assign the new color to it
 		glClear(GL_COLOR_BUFFER_BIT); //state-using function
 		// Tell OpenGL which Shader Program we want to use
 		shaderProgram.Activate();
 		glUniform1f(uniformID, 0.5f);
+		// Bind texture to main object
+		glBindTexture(GL_TEXTURE_2D, texture);
 		// Bind the VAO so OpenGL knows to use it
 		VAO1.Bind();
 		// Draw the triangle using the GL_TRIANGLES primitve
-		//glDrawArrays(GL_TRIANGLES, 0, 3);
+		// glDrawArrays(GL_TRIANGLES, 0, 3);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); //this specifys the primitive we wanna use, the amount of indices we wanna draw, the data type of the indices, and the index of our indecis.
 
 		// Swap the back buffer with the front buffer
@@ -150,6 +194,7 @@ int main() {
 	VAO1.Delete();
 	VBO1.Delete();
 	EBO1.Delete();
+	glDeleteTextures(1, &texture);
 	shaderProgram.Delete();
 
 
