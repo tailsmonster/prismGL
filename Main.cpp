@@ -11,6 +11,7 @@
 #include "VBO.h"
 #include "EBO.h"
 #include "VAO.h"
+#include "Camera.h"
 
 // Get some input control in GLFW. This function returns which key is being pressed.
 void processInput(GLFWwindow* window) {
@@ -28,38 +29,6 @@ void processInput(GLFWwindow* window) {
 
 const unsigned int width = 600;
 const unsigned int height = 600;
-
-// Vertices Coordinates for Triangle
-GLfloat triVertices[] = {
-	//               COORDS                     /      COLORS            //
-	-0.5f, -0.5f * float(sqrt(3)) / 3,     0.0f,   0.8f,  0.3f,  0.02f,  // Lower Left Corner
-	 0.5f, -0.5f * float(sqrt(3)) / 3,     0.0f,   0.5f,  0.65f, 0.4f,   // Lower Right Corner
-	 0.0f,  0.5f * float(sqrt(3)) * 2 / 3, 0.0f,   1.0f,  0.43f, 0.32f,  // Upper Corner
-	-0.25f, 0.5f * float(sqrt(3)) / 6,     0.0f,   0.9f,  0.56f, 0.69f,  // Inner Left
-	 0.25f, 0.5f * float(sqrt(3)) / 6,     0.0f,   0.63f, 0.2f,  0.15f,  // Inner Right
-	 0.0f, -0.5f * float(sqrt(3)) / 3,     0.0f,   0.8f,  0.3f,  0.02f,  // Inner Down
-};												                  
-// start index buffer wahooie!
-GLuint triIndices[] = {
-	0,3,5, //Lower left tri
-	3,2,4, //lower right tri
-	5,4,1 //top tri
-};
-
-
-
-//SQUARE :D
-GLfloat sqrVertices[] = {
-	//    COORDS              /      COLORS    /              MAPPING   //
-	-0.5f, -0.5f,  0.0f,       1.0f,  0.0f, 0.0f,       0.0f, 0.0f, // Lower Left Corner
-	-0.5f,  0.5f,  0.0f,       0.0f,  1.0f, 0.0f,       0.0f, 1.0f, // Upper Left Corner
-	 0.5f,  0.5f,  0.0f,       0.0f,  0.0f, 1.0f,       1.0f, 1.0f, // Upper Right Corner
-	 0.5f, -0.5f,  0.0f,       1.0f,  1.0f, 1.0f,       1.0f, 0.0f, // Lower Left Corner
-};
-GLuint sqrIndices[] = {
-	0, 2, 1, // Upper Tri
-	0, 3, 2  // Lower Triangle
-};
 
 
 
@@ -149,29 +118,19 @@ int main() {
 	Texture toaster("aigis.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
 	toaster.texUnit(shaderProgram, "tex0", 0);
 
-	//rotation timer
-	float rotation = 0.0f;
-	double prevTime = glfwGetTime();
-
-	// tell opengl to account for depth, so its sure about which triangle gos ontop of which.
+	// Enables the Depth Buffer, so OpenGL is sure about which triangle gos ontop of which.
 	glEnable(GL_DEPTH_TEST);
 
-
-	/* 
-	// Specify the color of the background
-	glClearColor(0.2f, 0.3f, 0.3f, 1.0f); //state-setting function
-	// Clean the back buffer and assign the new color to it
-	glClear(GL_COLOR_BUFFER_BIT); //state-using function
-	// Swap the back buffer with the front buffer
-	glfwSwapBuffers(window);
-	*/
+	// Camera!
+	Camera camera(width, height, glm::vec3(0.0f, 0.0f, 2.0f));
+	
 
 	// Main while loop
 	while (!glfwWindowShouldClose(window)) {
-		// user input
-		processInput(window);
+		
+		processInput(window); // FunnyInput
 
-		// render commands go here:
+		// RENDER COMMANDS GO HERE:
 		
 		// Specify the color of the background
 		glClearColor(0.2f, 0.1f, 0.3f, 1.0f); //state-setting function
@@ -180,30 +139,9 @@ int main() {
 		// Tell OpenGL which Shader Program we want to use
 		shaderProgram.Activate();
 
-		double crntTime = glfwGetTime();
-		if (crntTime - prevTime >= 1 / 60) {
-			rotation += 0.05f;
-			prevTime = crntTime;
-		}
-
-		// Initialization, cuz if no matrix will be full of zeroes, and any transformation done on it would result in a empty matrix
-		glm::mat4 model = glm::mat4(1.0f);
-		glm::mat4 view = glm::mat4(1.0f);
-		glm::mat4 proj = glm::mat4(1.0f);
-
-		model = glm::rotate(model, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
-		view = glm::translate(view, glm::vec3(0.0f, -0.5f, -2.0f));
-		proj = glm::perspective(glm::radians(45.0f), (float)(width / height), 0.1f, 100.0f);
-
-		int modelLoc = glGetUniformLocation(shaderProgram.ID, "model");
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		int viewLoc = glGetUniformLocation(shaderProgram.ID, "view");
-		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-		int projLoc = glGetUniformLocation(shaderProgram.ID, "proj");
-		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
-
-		// Assigns a value to the uniform; MUST ALWAYS BE DONE AFTER ACTIVATING SHADER PROGRAM
-		glUniform1f(uniformID, 0.5f);
+		camera.Inputs(window);
+		camera.Matrix(45.0f, 0.1f, 100.0f, shaderProgram, "camMatrix");
+		
 		// Bind texture to main object
 		toaster.Bind();
 		// Bind the VAO so OpenGL knows to use it
