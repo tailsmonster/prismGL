@@ -1,12 +1,13 @@
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <stb/std_image.h>
+#include <stb/stb_image.h>
 
-#include"shaderClass.h"
-#include"VBO.h"
-#include"EBO.h"
-#include"VAO.h"
+#include "Texture.h"
+#include "shaderClass.h"
+#include "VBO.h"
+#include "EBO.h"
+#include "VAO.h"
 
 // Get some input control in GLFW. This function returns which key is being pressed.
 void processInput(GLFWwindow* window) {
@@ -116,51 +117,19 @@ int main() {
 
 
 	// Texture!
-	int widthImg, heightImg, numColCh;
-	unsigned char* bytes = stbi_load("aigis.png", &widthImg, &heightImg, &numColCh, 0);
-
-	//the texture object itself
-	GLuint texture;
-	glGenTextures(1, &texture);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture);
-
-	// here we choose nearest neighbor or linear.
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	Texture toaster("aigis.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
+	toaster.texUnit(shaderProgram, "tex0", 0);
 
 
-	// repeating wahooie
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	
-	//gl plan to order
-	// float flatColor[] = {1.0f, 1.0f, 1.0f, 1.0f};
-	// glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, flatColor};
 
-	// gen texture
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, widthImg, heightImg, 0, GL_RGB, GL_UNSIGNED_BYTE, bytes);
-	glGenerateMipmap(GL_TEXTURE_2D);
-
-	/*
-	The most common color channels are 
-	GL_RGBA -> JPEG files
-	GL_RGB -> PNG files
-	*/
-
-	// texture uniform
-	GLuint tex0Uniform = glGetUniformLocation(shaderProgram.ID, "tex0");
-	shaderProgram.Activate();
-
-
+	/* 
 	// Specify the color of the background
 	glClearColor(0.2f, 0.3f, 0.3f, 1.0f); //state-setting function
 	// Clean the back buffer and assign the new color to it
 	glClear(GL_COLOR_BUFFER_BIT); //state-using function
 	// Swap the back buffer with the front buffer
 	glfwSwapBuffers(window);
-
-
+	*/
 
 	// Main while loop
 	while (!glfwWindowShouldClose(window)) {
@@ -168,15 +137,17 @@ int main() {
 		processInput(window);
 
 		// render commands go here:
+		
 		// Specify the color of the background
 		glClearColor(0.2f, 0.1f, 0.3f, 1.0f); //state-setting function
 		// Clean the back buffer and assign the new color to it
 		glClear(GL_COLOR_BUFFER_BIT); //state-using function
 		// Tell OpenGL which Shader Program we want to use
 		shaderProgram.Activate();
+		// Assigns a value to the uniform; MUST ALWAYS BE DONE AFTER ACTIVATING SHADER PROGRAM
 		glUniform1f(uniformID, 0.5f);
 		// Bind texture to main object
-		glBindTexture(GL_TEXTURE_2D, texture);
+		toaster.Bind();
 		// Bind the VAO so OpenGL knows to use it
 		VAO1.Bind();
 		// Draw the triangle using the GL_TRIANGLES primitve
@@ -194,7 +165,7 @@ int main() {
 	VAO1.Delete();
 	VBO1.Delete();
 	EBO1.Delete();
-	glDeleteTextures(1, &texture);
+	toaster.Delete();
 	shaderProgram.Delete();
 
 
