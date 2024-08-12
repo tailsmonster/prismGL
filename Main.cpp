@@ -73,10 +73,10 @@ int main() {
 	// In this case the viewpoint goes from x = 0, y = 0, to x = 600, y = 600
 	glViewport(0, 0, 600, 600);
 
-	//imports shaders
+	// create shader object, importing shaders default.vert and default.frag
 	Shader shaderProgram("default.vert", "default.frag");
 
-	//creates vertex array object & binds it
+	// creates vertex array object & binds it
 	VAO VAO1;
 	VAO1.Bind();
 
