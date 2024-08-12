@@ -12,7 +12,7 @@ class VAO {
         VAO();
         
         // Links a VBO to VAO using a certain layout
-        void LinkVBO(VBO& VBO, GLuint layout);//yay shaders
+        void LinkAttrib(VBO VBO, GLuint layout, GLuint numComponents, GLenum type, GLsizeiptr stride, void* offset);//yay shaders
         // Binds the vao
         void Bind();
         // unbinds the vao

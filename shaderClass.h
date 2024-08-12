@@ -21,6 +21,8 @@ class Shader {
         void Activate();
         // Deletes the shader programs
         void Delete();
+    private:   
+        void compileErrors(unsigned int shader, const char* type);
 };
 
 #endif

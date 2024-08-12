@@ -23,13 +23,14 @@ void processInput(GLFWwindow* window) {
 
 // Vertices Coordinates for Triangle
 GLfloat vertices[] = {
-	-0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f,  // Lower Left Corner
-	0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f,  //Lower Right Corner
-	0.0f, 0.5f * float(sqrt(3)) * 2 / 3, 0.0f,  // Upper Corner
-	-0.5f / 2, 0.5f * float(sqrt(3)) / 6, 0.0f,  // Inner Left
-	0.5f / 2, 0.5f * float(sqrt(3)) / 6, 0.0f,  // Inner Right
-	0.0f, -0.5f * float(sqrt(3)) / 3, 0.0f,  // Inner Down
-};
+	//               COORDS                     /      COLORS            //
+	-0.5f, -0.5f * float(sqrt(3)) / 3,     0.0f,   0.8f,  0.3f,  0.02f,  // Lower Left Corner
+	 0.5f, -0.5f * float(sqrt(3)) / 3,     0.0f,   0.5f,  0.65f, 0.4f,   // Lower Right Corner
+	 0.0f,  0.5f * float(sqrt(3)) * 2 / 3, 0.0f,   1.0f,  0.43f, 0.32f,  // Upper Corner
+	-0.25f, 0.5f * float(sqrt(3)) / 6,     0.0f,   0.9f,  0.56f, 0.69f,  // Inner Left
+	 0.25f, 0.5f * float(sqrt(3)) / 6,     0.0f,   0.63f, 0.2f,  0.15f,  // Inner Right
+	 0.0f, -0.5f * float(sqrt(3)) / 3,     0.0f,   0.8f,  0.3f,  0.02f,  // Inner Down
+};												                  
 // start index buffer wahooie!
 GLuint indices[] = {
 	0,3,5, //Lower left tri
@@ -85,10 +86,13 @@ int main() {
 	EBO EBO1(indices, sizeof(indices));
 
 	// Links our VBO to our VAO. Then unbind VAO, VBO, and EBO to prevent overwriting
-	VAO1.LinkVBO(VBO1, 0);
+	VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 6 * sizeof(float), (void*)0);
+	VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 	VAO1.Unbind();
 	VBO1.Unbind();
 	EBO1.Unbind();
+
+	GLuint uniformID = glGetUniformLocation(shaderProgram.ID, "scale");
 
 
 	// Specify the color of the background
@@ -110,9 +114,9 @@ int main() {
 		glClearColor(0.2f, 0.3f, 0.8f, 1.0f); //state-setting function
 		// Clean the back buffer and assign the new color to it
 		glClear(GL_COLOR_BUFFER_BIT); //state-using function
-
 		// Tell OpenGL which Shader Program we want to use
 		shaderProgram.Activate();
+		glUniform1f(uniformID, 0.5f);
 		// Bind the VAO so OpenGL knows to use it
 		VAO1.Bind();
 		// Draw the triangle using the GL_TRIANGLES primitve

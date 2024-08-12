@@ -5,26 +5,21 @@ VAO::VAO() {
     glGenVertexArrays(1, &ID);
 }
 
-void VAO::LinkVBO(VBO& VBO, GLuint layout) {
+void VAO::LinkAttrib(VBO VBO, GLuint layout, GLuint numComponents, GLenum type, GLsizeiptr stride, void* offset) {
     VBO.Bind();
-    // Configure the Vertex Attribute so that OpenGL knows how read the VBO
-    glVertexAttribPointer(layout, 3, GL_FLOAT, GL_FALSE, 0, (void*)0 /* <- weird pointer void for our offset, usually a pointer to where our vertices begin in an array*/);
-    // Enable the Vertex Attribute so that OpenGL knows how to use it 
-    glEnableVertexAttribArray(layout);
+    glVertexAttribPointer(layout, numComponents, type, GL_FALSE, stride, offset/* (void*)0  <- weird pointer void for our offset, usually a pointer to where our vertices begin in an array*/); // Configure the Vertex Attribute so that OpenGL knows how read the VBO
+    glEnableVertexAttribArray(layout);    // Enable the Vertex Attribute so that OpenGL knows how to use it 
     VBO.Unbind();
 }
 
 void VAO::Bind() {
-    // Make the VAO the current Vertex Array Object by binding it
-    glBindVertexArray(ID);
+    glBindVertexArray(ID); // Make the VAO the current Vertex Array Object by binding it
 }
 
 void VAO::Unbind() {
-    // Bind VAO to 0 to not accidentally modify the Vertex Array Object
-    glBindVertexArray(0);
+    glBindVertexArray(0);  // Bind VAO to 0 to not accidentally modify the Vertex Array Object
 }
 
 void VAO::Delete() {
-    // Delete now useless Vertex Array Object
-    glDeleteVertexArrays(1, &ID);
+    glDeleteVertexArrays(1, &ID); // Delete now useless Vertex Array Object
 }
