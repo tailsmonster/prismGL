@@ -1,6 +1,7 @@
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <stb/std_image.h>
 
 #include"shaderClass.h"
 #include"VBO.h"
@@ -22,7 +23,7 @@ void processInput(GLFWwindow* window) {
 }
 
 // Vertices Coordinates for Triangle
-GLfloat vertices[] = {
+GLfloat triVertices[] = {
 	//               COORDS                     /      COLORS            //
 	-0.5f, -0.5f * float(sqrt(3)) / 3,     0.0f,   0.8f,  0.3f,  0.02f,  // Lower Left Corner
 	 0.5f, -0.5f * float(sqrt(3)) / 3,     0.0f,   0.5f,  0.65f, 0.4f,   // Lower Right Corner
@@ -32,10 +33,25 @@ GLfloat vertices[] = {
 	 0.0f, -0.5f * float(sqrt(3)) / 3,     0.0f,   0.8f,  0.3f,  0.02f,  // Inner Down
 };												                  
 // start index buffer wahooie!
-GLuint indices[] = {
+GLuint triIndices[] = {
 	0,3,5, //Lower left tri
 	3,2,4, //lower right tri
 	5,4,1 //top tri
+};
+
+
+
+//SQUARE :D
+GLfloat vertices[] = {
+	//    COORDS          /      COLORS            //
+	-0.5f, -0.5f,  0.0f,   1.0f,  0.0f, 0.0f,  // Lower Left Corner
+	-0.5f,  0.5f,  0.0f,   0.0f,  1.0f, 0.0f,  // Upper Left Corner
+	 0.5f,  0.5f,  0.0f,   0.0f,  0.0f, 1.0f,  // Upper Right Corner
+	 0.5f, -0.5f,  0.0f,   1.0f,  1.0f, 1.0f,  // Lower Left Corner
+};
+GLuint indices[] = {
+	0, 2, 1,
+	0, 3, 2
 };
 
 
@@ -121,7 +137,7 @@ int main() {
 		VAO1.Bind();
 		// Draw the triangle using the GL_TRIANGLES primitve
 		//glDrawArrays(GL_TRIANGLES, 0, 3);
-		glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0); //this specifys the primitive we wanna use, the amount of indices we wanna draw, the data type of the indices, and the index of our indecis.
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); //this specifys the primitive we wanna use, the amount of indices we wanna draw, the data type of the indices, and the index of our indecis.
 
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
