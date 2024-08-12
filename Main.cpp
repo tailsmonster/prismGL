@@ -26,6 +26,9 @@ void processInput(GLFWwindow* window) {
 	}
 }
 
+const unsigned int width = 600;
+const unsigned int height = 600;
+
 // Vertices Coordinates for Triangle
 GLfloat triVertices[] = {
 	//               COORDS                     /      COLORS            //
@@ -46,17 +49,40 @@ GLuint triIndices[] = {
 
 
 //SQUARE :D
-GLfloat vertices[] = {
+GLfloat sqrVertices[] = {
 	//    COORDS              /      COLORS    /              MAPPING   //
 	-0.5f, -0.5f,  0.0f,       1.0f,  0.0f, 0.0f,       0.0f, 0.0f, // Lower Left Corner
 	-0.5f,  0.5f,  0.0f,       0.0f,  1.0f, 0.0f,       0.0f, 1.0f, // Upper Left Corner
 	 0.5f,  0.5f,  0.0f,       0.0f,  0.0f, 1.0f,       1.0f, 1.0f, // Upper Right Corner
 	 0.5f, -0.5f,  0.0f,       1.0f,  1.0f, 1.0f,       1.0f, 0.0f, // Lower Left Corner
 };
-GLuint indices[] = {
+GLuint sqrIndices[] = {
 	0, 2, 1, // Upper Tri
 	0, 3, 2  // Lower Triangle
 };
+
+
+
+//PRISMATIC >:D
+GLfloat vertices[] = {
+	//    COORDS              /      COLORS    /      TEXTURE COORDS   //
+
+	-0.5f,  0.0f,  0.5f,       1.0f,  0.0f, 0.0f,       0.0f, 0.0f,
+	-0.5f,  0.0f, -0.5f,       1.0f,  1.0f, 0.0f,       5.0f, 0.0f,
+	 0.5f,  0.0f, -0.5f,       1.0f,  1.0f, 1.0f,       0.0f, 0.0f,
+	 0.5f,  0.0f,  0.5f,       1.0f,  1.0f, 1.0f,       5.0f, 0.0f,
+	 0.0f,  0.8f,  0.0f,       1.0f,  1.0f, 1.0f,       2.5f, 2.5f,
+};
+GLuint indices[] = {
+	0, 1, 2,
+	0, 2, 3,	
+	0, 1, 4,
+	1, 2, 4,
+	2, 3, 4,
+	3, 0, 4,
+};
+
+
 
 
 
@@ -76,7 +102,7 @@ int main() {
 
 
 	// Create the GLFWwindow object of 600 x 600 pixels, called "First OpenGL Project"
-	GLFWwindow* window = glfwCreateWindow(600, 600, "First OpenGL Project", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(width, height, "First OpenGL Project", NULL, NULL);
 	// Error check incase window fails to create
 	if (window == NULL) {
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -92,7 +118,7 @@ int main() {
 	gladLoadGL();
 	// Specify the viewpoint of OpenGL in the Window
 	// In this case the viewpoint goes from x = 0, y = 0, to x = 600, y = 600
-	glViewport(0, 0, 600, 600);
+	glViewport(0, 0, width, height);
 
 	// create shader object, importing shaders default.vert and default.frag
 	Shader shaderProgram("default.vert", "default.frag");
@@ -123,6 +149,12 @@ int main() {
 	Texture toaster("aigis.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
 	toaster.texUnit(shaderProgram, "tex0", 0);
 
+	//rotation timer
+	float rotation = 0.0f;
+	double prevTime = glfwGetTime();
+
+	// tell opengl to account for depth, so its sure about which triangle gos ontop of which.
+	glEnable(GL_DEPTH_TEST);
 
 
 	/* 
@@ -144,9 +176,32 @@ int main() {
 		// Specify the color of the background
 		glClearColor(0.2f, 0.1f, 0.3f, 1.0f); //state-setting function
 		// Clean the back buffer and assign the new color to it
-		glClear(GL_COLOR_BUFFER_BIT); //state-using function
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //state-using function
 		// Tell OpenGL which Shader Program we want to use
 		shaderProgram.Activate();
+
+		double crntTime = glfwGetTime();
+		if (crntTime - prevTime >= 1 / 60) {
+			rotation += 0.05f;
+			prevTime = crntTime;
+		}
+
+		// Initialization, cuz if no matrix will be full of zeroes, and any transformation done on it would result in a empty matrix
+		glm::mat4 model = glm::mat4(1.0f);
+		glm::mat4 view = glm::mat4(1.0f);
+		glm::mat4 proj = glm::mat4(1.0f);
+
+		model = glm::rotate(model, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
+		view = glm::translate(view, glm::vec3(0.0f, -0.5f, -2.0f));
+		proj = glm::perspective(glm::radians(45.0f), (float)(width / height), 0.1f, 100.0f);
+
+		int modelLoc = glGetUniformLocation(shaderProgram.ID, "model");
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		int viewLoc = glGetUniformLocation(shaderProgram.ID, "view");
+		glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+		int projLoc = glGetUniformLocation(shaderProgram.ID, "proj");
+		glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(proj));
+
 		// Assigns a value to the uniform; MUST ALWAYS BE DONE AFTER ACTIVATING SHADER PROGRAM
 		glUniform1f(uniformID, 0.5f);
 		// Bind texture to main object
@@ -155,7 +210,7 @@ int main() {
 		VAO1.Bind();
 		// Draw the triangle using the GL_TRIANGLES primitve
 		// glDrawArrays(GL_TRIANGLES, 0, 3);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0); //this specifys the primitive we wanna use, the amount of indices we wanna draw, the data type of the indices, and the index of our indecis.
+		glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(int), GL_UNSIGNED_INT, 0); //this specifys the primitive we wanna use, the amount of indices we wanna draw, the data type of the indices, and the index of our indecis.
 
 		// Swap the back buffer with the front buffer
 		glfwSwapBuffers(window);
