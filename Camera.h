@@ -3,13 +3,13 @@
 #define CAMERA_CLASS_H
 
 #include <iostream>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtx/rotate_vector.hpp>
-#include <glm/gtx/vector_angle.hpp>
+#include "include/glad/glad.h"
+#include "include/GLFW/glfw3.h"
+#include "include/glm/glm.hpp"
+#include "include/glm/gtc/matrix_transform.hpp"
+#include "include/glm/gtc/type_ptr.hpp"
+#include "include/glm/gtx/rotate_vector.hpp"
+#include "include/glm/gtx/vector_angle.hpp"
 
 #include "shaderClass.h"
 

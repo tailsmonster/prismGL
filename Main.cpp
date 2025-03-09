@@ -1,10 +1,15 @@
 #include <iostream>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <stb/stb_image.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
+
+#define GLAD_GL_IMPLEMENTATION
+#include "include/glad/glad.h"
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "include/stb/stb_image.h"
+
+#include "include/GLFW/glfw3.h"
+#include "include/glm/glm.hpp"
+#include "include/glm/gtc/matrix_transform.hpp"
+#include "include/glm/gtc/type_ptr.hpp"
 
 #include "Texture.h"
 #include "shaderClass.h"
