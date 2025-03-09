@@ -1,0 +1,1 @@
+/sbin/c++ -Wl,--dependency-file=CMakeFiles/prismGL.dir/link.d CMakeFiles/prismGL.dir/Main.cpp.o CMakeFiles/prismGL.dir/shaderClass.cpp.o CMakeFiles/prismGL.dir/VBO.cpp.o CMakeFiles/prismGL.dir/EBO.cpp.o CMakeFiles/prismGL.dir/VAO.cpp.o CMakeFiles/prismGL.dir/Texture.cpp.o CMakeFiles/prismGL.dir/Camera.cpp.o -o prismGL  /usr/lib/libGL.so -lglfw -ldl -lpthread -lX11
