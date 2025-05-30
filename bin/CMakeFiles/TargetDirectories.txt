@@ -1,3 +1,0 @@
-/home/tailsmonster/Prismatic/projects/prismGL/bin/CMakeFiles/prismGL.dir
-/home/tailsmonster/Prismatic/projects/prismGL/bin/CMakeFiles/edit_cache.dir
-/home/tailsmonster/Prismatic/projects/prismGL/bin/CMakeFiles/rebuild_cache.dir
