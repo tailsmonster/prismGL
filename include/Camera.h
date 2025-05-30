@@ -28,6 +28,7 @@ class Camera {
 
         void Matrix(float FOVdeg, float nearPlane, float farPlane, Shader& shader, const char* uniform); // send create and view projection matrixes to the shader
         void Inputs(GLFWwindow* window); //handle inputs
+        void UpdateSize(int newWidth, int newHeight);
 };
 
 #endif

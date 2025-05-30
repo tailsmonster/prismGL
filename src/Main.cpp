@@ -1,5 +1,6 @@
 #include <iostream>
 #include <stdexcept> // for std::runtime_error
+#include <filesystem>
 
 // External libs
 #include "glad/glad.h"
@@ -9,10 +10,6 @@
 #include "glm/gtc/matrix_transform.hpp"
 #include "glm/gtc/type_ptr.hpp"
 
-// Shaders
-#include "default_frag.h"
-#include "default_vert.h"
-
 // Engine components
 #include "Texture.h"
 #include "shaderClass.h"
@@ -20,6 +17,20 @@
 #include "EBO.h"
 #include "VAO.h"
 #include "Camera.h"
+
+const unsigned int initialWidth = 600;
+const unsigned int initialHeight = 600;
+
+Camera* mainCamera = nullptr;
+
+// Framebuffer resize callback to update viewport and camera size
+void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+	if (width == 0 || height == 0) return; // avoid issues on minimized window
+	glViewport(0, 0, width, height);
+	if (mainCamera) {
+		mainCamera->UpdateSize(width, height);
+	}
+}
 
 void processInput(GLFWwindow* window) {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -65,11 +76,11 @@ int main() {
 		if (!gladLoadGL())
 			throw std::runtime_error("Failed to initialize GLAD");
 
-		glViewport(0, 0, width, height);
+		glViewport(0, 0, initialWidth, initialHeight);
 		glEnable(GL_DEPTH_TEST);
 
 		// --- Shader, VAO/VBO/EBO setup ---
-		Shader shaderProgram("default.vert", "default.frag");
+		Shader shaderProgram;
 
 		VAO VAO1;
 		VAO1.Bind();
@@ -85,11 +96,15 @@ int main() {
 		VBO1.Unbind();
 		EBO1.Unbind();
 
+		if (!std::filesystem::exists("../res/aigis.png")) {
+    	throw std::runtime_error("Missing texture: ../res/aigis.png");
+		}
 		Texture toaster("../res/aigis.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGB, GL_UNSIGNED_BYTE);
+
 		toaster.texUnit(shaderProgram, "tex0", 0);
 
-		Camera camera(width, height, glm::vec3(0.0f, 0.0f, 2.0f));
-
+		Camera camera(initialWidth, initialHeight, glm::vec3(0.0f, 0.0f, 2.0f));
+		mainCamera = &camera;
 		while (!glfwWindowShouldClose(window)) {
 			processInput(window);
 

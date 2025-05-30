@@ -13,7 +13,7 @@ void Camera::Matrix(float FOVdeg, float nearPlane, float farPlane, Shader& shade
     glm::mat4 projection = glm::mat4(1.0f);
 
     view = glm::lookAt(Position, Position + Orientation, Up);
-    projection = glm::perspective(glm::radians(FOVdeg), (float)(width / height), nearPlane, farPlane); 
+    projection = glm::perspective(glm::radians(FOVdeg), (float)width / (float)height, nearPlane, farPlane);
 
     glUniformMatrix4fv(glGetUniformLocation(shader.ID, uniform), 1, GL_FALSE, glm::value_ptr(projection * view)); //export matrix to vertex shader
 }
@@ -52,4 +52,9 @@ void Camera::Inputs(GLFWwindow* window) {
         glfwSetCursorPos(window, (width / 2), (height / 2));
     }
     else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE) glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+}
+
+void Camera::UpdateSize(int newWidth, int newHeight) {
+    width = newWidth;
+    height = newHeight;
 }

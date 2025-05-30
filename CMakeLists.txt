@@ -26,8 +26,8 @@ add_executable(prismGL ${SOURCES})
 target_include_directories(prismGL PRIVATE
     ${GLFW_INCLUDE_DIRS}            # GLFW headers from pkg-config
     ${CMAKE_SOURCE_DIR}/include     # Your project headers
+    ${CMAKE_SOURCE_DIR}/shaders     # Your project shaders
     ${CMAKE_SOURCE_DIR}/libraries
-    # ${CMAKE_SOURCE_DIR}/libraries/glm           # glm headers
 )
 
 # Link libraries needed
