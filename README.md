@@ -8,7 +8,7 @@ I decided to diverge from the web development I'd have spent the last 10 months 
 While this is a small project, it shows a commitment to self learning! This project was tough for me! But I was able to pull through, and learn so many new concepts in such a short amount of time.
 
 <!-- ![Screenshot](https://github.com/tailsmonster/portfolio/blob/main/vite-project/src/assets/static/screenshots/prismgl.png?raw=true) -->
-<img src="https://github.com/tailsmonster/portfolio/blob/main/vite-project/src/assets/static/screenshots/prismgl.png?raw=true" alt="screenshot" height="300" width="533.5">
+<img src="https://github.com/tailsmonster/portfolio/blob/main/vite-project/public/screenshots/prismgl.png?raw=true" alt="screenshot" height="300" width="533.5">
 
 Presentation Slides: https://docs.google.com/presentation/d/1KO9wPCWXOwfeYVaQ4cV5OP2ssWn4ZD9pixSIIrQd90w
 
