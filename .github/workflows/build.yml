@@ -3,9 +3,13 @@ name: Build
 on:
   push:
     branches: [ main, master ]
+    tags: [ 'v*' ]
   pull_request:
     branches: [ main, master ]
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -20,16 +24,19 @@ jobs:
             os: ubuntu-latest
             preset: linux-release
             artifact: prismGL-linux
+            package: prismGL-linux.tar.gz
             build_dir: build/linux-release
           - name: Windows MSVC
             os: windows-2022
             preset: windows-release
             artifact: prismGL-windows-msvc
+            package: prismGL-windows-msvc.zip
             build_dir: build/windows-release
           - name: Windows MinGW
             os: ubuntu-latest
             preset: windows-mingw-release
             artifact: prismGL-windows-mingw
+            package: prismGL-windows-mingw.zip
             build_dir: build/windows-mingw-release
 
     steps:
@@ -54,7 +61,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y \
             g++-mingw-w64-x86-64 \
-            gcc-mingw-w64-x86-64
+            gcc-mingw-w64-x86-64 \
+            zip
 
       - name: Verify Visual Studio generator
         if: matrix.preset == 'windows-release'
@@ -82,12 +90,55 @@ jobs:
       - name: Build
         run: cmake --build --preset ${{ matrix.preset }} --config Release
 
+      - name: Package Linux artifact
+        if: runner.os == 'Linux' && matrix.preset == 'linux-release'
+        run: |
+          mkdir -p dist/package
+          cp -R ${{ matrix.build_dir }}/bin dist/package/bin
+          cp -R ${{ matrix.build_dir }}/res dist/package/res
+          tar -czf dist/${{ matrix.package }} -C dist/package .
+
+      - name: Package Windows artifact on Linux
+        if: runner.os == 'Linux' && matrix.preset == 'windows-mingw-release'
+        run: |
+          mkdir -p dist/package
+          cp -R ${{ matrix.build_dir }}/bin dist/package/bin
+          cp -R ${{ matrix.build_dir }}/res dist/package/res
+          (cd dist/package && zip -r ../${{ matrix.package }} .)
+
+      - name: Package Windows artifact on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist/package | Out-Null
+          Copy-Item -Recurse -Force "${{ matrix.build_dir }}/bin" "dist/package/bin"
+          Copy-Item -Recurse -Force "${{ matrix.build_dir }}/res" "dist/package/res"
+          Compress-Archive -Path dist/package/* -DestinationPath "dist/${{ matrix.package }}" -Force
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}
           path: |
-            ${{ matrix.build_dir }}/bin/**
-            ${{ matrix.build_dir }}/res/**
+            dist/${{ matrix.package }}
           if-no-files-found: error
           retention-days: 14
+
+  release:
+    name: Publish Release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
+          generate_release_notes: true

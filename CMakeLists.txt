@@ -83,7 +83,7 @@ set_target_properties(prismGL PROPERTIES
 foreach(config IN LISTS CMAKE_CONFIGURATION_TYPES)
     string(TOUPPER "${config}" config_upper)
     set_target_properties(prismGL PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY_${config_upper} ${CMAKE_BINARY_DIR}/bin/${config}
+        RUNTIME_OUTPUT_DIRECTORY_${config_upper} ${CMAKE_BINARY_DIR}/bin
     )
 endforeach()
 

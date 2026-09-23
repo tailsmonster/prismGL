@@ -61,7 +61,7 @@ cmake --build --preset windows-release --config Release
 Output:
 
 ```powershell
-build/windows-release/bin/Release/prismGL.exe
+build/windows-release/bin/prismGL.exe
 ```
 
 ### Windows cross-build from Linux
@@ -92,5 +92,4 @@ build/windows-mingw-release/bin/prismGL.exe
 
 - Runtime assets are expected in a `res` directory next to the build output directory.
 - The default texture can be replaced by swapping `res/aigis.png` with another PNG using the same filename.
-
 
