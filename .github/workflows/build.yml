@@ -22,7 +22,7 @@ jobs:
             artifact: prismGL-linux
             build_dir: build/linux-release
           - name: Windows MSVC
-            os: windows-latest
+            os: windows-2022
             preset: windows-release
             artifact: prismGL-windows-msvc
             build_dir: build/windows-release
@@ -62,11 +62,19 @@ jobs:
         run: |
           cmake --version
           cmake --list-presets=all
-          & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" `
+
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $vsPath = & $vswhere `
             -latest `
             -products * `
             -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 `
             -property installationPath
+
+          if (-not $vsPath) {
+            throw "Visual Studio 2022 with the MSVC C++ workload was not found."
+          }
+
+          Write-Host "Using Visual Studio installation: $vsPath"
 
       - name: Configure
         run: cmake --preset ${{ matrix.preset }}
