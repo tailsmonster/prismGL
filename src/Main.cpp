@@ -25,6 +25,7 @@ Camera* mainCamera = nullptr;
 
 // Framebuffer resize callback to update viewport and camera size
 void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+	(void)window;
 	if (width == 0 || height == 0) return; // avoid issues on minimized window
 	glViewport(0, 0, width, height);
 	if (mainCamera) {
@@ -72,6 +73,7 @@ int main() {
 			throw std::runtime_error("Failed to create GLFW window");
 
 		glfwMakeContextCurrent(window);
+		glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 		if (!gladLoadGL())
 			throw std::runtime_error("Failed to initialize GLAD");
@@ -105,14 +107,20 @@ int main() {
 
 		Camera camera(initialWidth, initialHeight, glm::vec3(0.0f, 0.0f, 2.0f));
 		mainCamera = &camera;
+
+		double lastFrameTime = glfwGetTime();
 		while (!glfwWindowShouldClose(window)) {
+			double currentFrameTime = glfwGetTime();
+			float deltaTime = static_cast<float>(currentFrameTime - lastFrameTime);
+			lastFrameTime = currentFrameTime;
+
 			processInput(window);
 
 			glClearColor(0.2f, 0.1f, 0.3f, 1.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 			shaderProgram.Activate();
-			camera.Inputs(window);
+			camera.Inputs(window, deltaTime);
 			camera.Matrix(45.0f, 0.1f, 100.0f, shaderProgram, "camMatrix");
 
 			toaster.Bind();
