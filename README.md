@@ -1,55 +1,96 @@
 # prismGL
-### _My Capstone Project for The Marcy Lab School_
-*A lightweight OpenGL-based 3D graphics application built from scratch in C++*
 
-As a part of our Software Engineering Fellowship, we had 10 weeks to learn a brand new technology and create a capstone project with it.
-I decided to diverge from the web development I'd have spent the last 10 months learning to dive deeper into low-level programming. I've always been fascinated with game development, and making *something* in that realm was my main motivator behind going down this route. I started out by learning **C**, and once I had a handle on the basics I moved onto picking up **C++**. Eventually came time to pick up **OpenGL** (a graphics library I had chosen for being an industry standard) and used that alongside **GLFW** to manage windows and OpenGL contexts, **Glad** to manage function pointers for OpenGL, and later incorporated **GLM**, a C++ math library for OpenGL's shading language.
+Lightweight OpenGL 3D renderer built in C++ as a capstone project for The Marcy Lab School.
 
-While this is a small project, it shows a commitment to self learning! This project was tough for me! But I was able to pull through, and learn so many new concepts in such a short amount of time.
+<img src="https://nicoaroca.dev/screenshots/prismgl.png" alt="prismGL screenshot" height="300" width="533.5">
 
-<!-- ![Screenshot](https://github.com/tailsmonster/portfolio/blob/main/vite-project/src/assets/static/screenshots/prismgl.png?raw=true) -->
-<img src="https://nicoaroca.dev/screenshots/prismgl.png" alt="screenshot" height="300" width="533.5">
+## Overview
 
-Presentation Slides: https://docs.google.com/presentation/d/1KO9wPCWXOwfeYVaQ4cV5OP2ssWn4ZD9pixSIIrQd90w
+prismGL is a small graphics project focused on learning low-level rendering fundamentals outside of a web stack. It creates an OpenGL window, loads textures, renders indexed geometry, and implements a movable camera.
 
-This was originally built on Windows 10 on Visual Studio, but I had issues compiling a release executable. Since I use Linux 24/7 nowadays, I've made it to now compile with only CMake, making it crossplatform and portable, also squashing any bugs I didn't resolve previously. I mostly just did this to have an actual binary to share, for portfolio purposes.
+The project is now built with CMake and supports Linux, Windows/MSVC, and Windows cross-compilation from Linux with MinGW-w64.
 
----
+## Tech Stack
 
-### BUILDING
-
-Dependencies:
-- CMake
-- C++17
-- OpenGL 3.3+
-- GLFW 
+- C++20
+- OpenGL 3.3
+- GLFW
+- GLAD
 - GLM
+- stb_image
+- CMake
 
-Linux:
+## Features
+
+- Textured 3D geometry rendered with OpenGL
+- Camera movement with frame-rate independent controls
+- Mouse-look camera rotation
+- Resizable viewport with framebuffer-aware resizing
+- Cross-platform CMake builds
+- GitHub Actions artifacts for Linux and Windows
+
+## Capstone Presentation Slides
+> https://docs.google.com/presentation/d/1KO9wPCWXOwfeYVaQ4cV5OP2ssWn4ZD9pixSIIrQd90w
+
+## Build
+
+### Linux
+
+Install build dependencies, then run:
+
 ```bash
-$ mkdir build && cd build
-$ cmake ..
-$ make
+cmake --preset linux-release
+cmake --build --preset linux-release --config Release
 ```
 
-Windows:
+Output:
+
+```bash
+build/linux-release/bin/prismGL
+```
+
+### Windows with Visual Studio
+
+From a Windows machine with Visual Studio 2022 installed:
 
 ```powershell
-COMING SOON
+cmake --preset windows-release
+cmake --build --preset windows-release --config Release
 ```
 
-### CONTROLS
+Output:
 
-- `W, A, S, D` — Move camera
+```powershell
+build/windows-release/bin/Release/prismGL.exe
+```
 
-- `Mouse Left Button` + Move — Look around
+### Windows cross-build from Linux
 
-- `Space / Left Ctrl` — Move up/down
+Install MinGW-w64, then run:
 
-- `Left Shift` — Increase movement speed
+```bash
+cmake --preset windows-mingw-release
+cmake --build --preset windows-mingw-release --config Release
+```
 
-- `ESC` — Close the window
+Output:
 
-- `R`  — Rename the window
+```bash
+build/windows-mingw-release/bin/prismGL.exe
+```
 
-> Technically, you can replace aigis.png with any file of the same name. So, you can add your own custom png texture this way!
+## Controls
+
+- `W`, `A`, `S`, `D` — Move camera
+- `Space` / `Left Ctrl` — Move up/down
+- `Left Shift` — Sprint
+- `Left Mouse Button` + move mouse — Look around
+- `R` — Rename the window
+- `Esc` — Close the window
+
+## Notes
+
+- Runtime assets are expected in a `res` directory next to the build output directory.
+- The default texture can be replaced by swapping `res/aigis.png` with another PNG using the same filename.
+
+
