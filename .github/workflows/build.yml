@@ -1,0 +1,85 @@
+name: Build
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Linux
+            os: ubuntu-latest
+            preset: linux-release
+            artifact: prismGL-linux
+            build_dir: build/linux-release
+          - name: Windows MSVC
+            os: windows-latest
+            preset: windows-release
+            artifact: prismGL-windows-msvc
+            build_dir: build/windows-release
+          - name: Windows MinGW
+            os: ubuntu-latest
+            preset: windows-mingw-release
+            artifact: prismGL-windows-mingw
+            build_dir: build/windows-mingw-release
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Linux build dependencies
+        if: matrix.preset == 'linux-release'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libx11-dev \
+            libxrandr-dev \
+            libxinerama-dev \
+            libxcursor-dev \
+            libxi-dev \
+            libgl1-mesa-dev
+
+      - name: Install MinGW-w64 cross compiler
+        if: matrix.preset == 'windows-mingw-release'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            g++-mingw-w64-x86-64 \
+            gcc-mingw-w64-x86-64
+
+      - name: Verify Visual Studio generator
+        if: matrix.preset == 'windows-release'
+        shell: pwsh
+        run: |
+          cmake --version
+          cmake --list-presets=all
+          & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" `
+            -latest `
+            -products * `
+            -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 `
+            -property installationPath
+
+      - name: Configure
+        run: cmake --preset ${{ matrix.preset }}
+
+      - name: Build
+        run: cmake --build --preset ${{ matrix.preset }} --config Release
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: |
+            ${{ matrix.build_dir }}/bin/**
+            ${{ matrix.build_dir }}/res/**
+          if-no-files-found: error
+          retention-days: 14
