@@ -8,3 +8,6 @@ build/cmake_install.cmake
 build/CMakeCache.txt
 build/Makefile
 build/prismGL
+build/linux-release
+build/windows-release
+build/windows-mingw-release
