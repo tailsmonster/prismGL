@@ -21,13 +21,16 @@ class Camera {
 
         int width, height;
 
-        float speed = 0.1f; //speed of camera
+        bool firstClick = true;
+
+        float speed = 1.5f; //speed of camera in units per second
+        float sprintSpeed = 6.0f;
         float sensitivity = 100.0f; // sensitivity when moving around
 
         Camera(int width, int hiehgt, glm::vec3 position); // simple constructor
 
         void Matrix(float FOVdeg, float nearPlane, float farPlane, Shader& shader, const char* uniform); // send create and view projection matrixes to the shader
-        void Inputs(GLFWwindow* window); //handle inputs
+        void Inputs(GLFWwindow* window, float deltaTime); //handle inputs
         void UpdateSize(int newWidth, int newHeight);
 };
 
